@@ -64,7 +64,6 @@ struct t_type_of<xemmaix::suisha::t_timer> : t_type
 		object.f_pointer__(a_value);
 		return object;
 	}
-
 	static void f_define(t_extension* a_extension);
 
 	using t_type::t_type;
