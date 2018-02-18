@@ -1,9 +1,6 @@
 #include "loop.h"
 
-namespace xemmaix
-{
-
-namespace suisha
+namespace xemmaix::suisha
 {
 
 namespace
@@ -67,8 +64,6 @@ void t_extension::f_scan(t_scan a_scan)
 	a_scan(v_type_wait);
 	a_scan(v_type_timer);
 	a_scan(v_type_loop);
-}
-
 }
 
 }

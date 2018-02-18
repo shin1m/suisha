@@ -4,10 +4,7 @@
 #include "suisha.h"
 #include <xemmai/thread.h>
 
-namespace xemmaix
-{
-
-namespace suisha
+namespace xemmaix::suisha
 {
 
 struct t_wait
@@ -31,8 +28,6 @@ struct t_timer
 		v_timer->f_stop();
 	}
 };
-
-}
 
 }
 

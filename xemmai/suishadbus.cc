@@ -1,10 +1,7 @@
 #include <xemmaix/dbus/connection.h>
 #include <suisha/dbus.h>
 
-namespace xemmaix
-{
-
-namespace suishadbus
+namespace xemmaix::suishadbus
 {
 
 using namespace xemmai;
@@ -24,8 +21,6 @@ struct t_extension : xemmai::t_extension
 	{
 	}
 };
-
-}
 
 }
 

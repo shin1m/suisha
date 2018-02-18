@@ -4,10 +4,7 @@
 #include <suisha/loop.h>
 #include <xemmai/convert.h>
 
-namespace xemmaix
-{
-
-namespace suisha
+namespace xemmaix::suisha
 {
 
 using namespace ::suisha;
@@ -91,8 +88,6 @@ template<>
 inline t_object* t_extension::f_type<t_loop>() const
 {
 	return v_type_loop;
-}
-
 }
 
 }
