@@ -97,8 +97,7 @@ suisha.main(@(loop) dbus.main(@
 			if x.get_type() == dbus.MESSAGE_TYPE_ERROR
 				print(x.get(
 				loop.exit(
-	loop.poll(0, true, false, @(readable, writable)
-		if !readable: return
+	loop.poll(0, true, false, @(readable, writable) if readable
 		line = system.in.read_line(
 		if line == ""
 			loop.exit(
@@ -108,6 +107,7 @@ suisha.main(@(loop) dbus.main(@
 				remote.writer.flush(
 			catch Throwable e
 				print(e
+	system.native_in.blocking__(false
 	try
 		loop.run(
 	finally

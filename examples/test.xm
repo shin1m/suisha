@@ -3,7 +3,7 @@ print = system.out.write_line
 suisha = Module("suisha"
 text = Module("text"
 
-read = @()
+read = @
 	xs = [
 	text.parse(system.in.read_line(), @(x) x <= 0x20, xs.push
 	xs
@@ -33,8 +33,7 @@ suisha.main(@(loop)
 		print("before wait"
 		wait(
 		print("after wait"
-	loop.poll(0, true, false, @(readable, writable)
-		if !readable: return
+	loop.poll(0, true, false, @(readable, writable) if readable
 		line = read(
 		if line.size() > 0
 			command = line.shift(
@@ -44,4 +43,5 @@ suisha.main(@(loop)
 				print("unknown command: " + command
 		else
 			loop.exit(
+	system.native_in.blocking__(false
 	loop.run(
