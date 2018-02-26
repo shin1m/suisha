@@ -107,7 +107,7 @@ suisha.main(@(loop) dbus.main(@
 				remote.writer.flush(
 			catch Throwable e
 				print(e
-	system.native_in.blocking__(false
+	system.raw_in.blocking__(false
 	try
 		loop.run(
 	finally

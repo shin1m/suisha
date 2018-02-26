@@ -43,5 +43,5 @@ suisha.main(@(loop)
 				print("unknown command: " + command
 		else
 			loop.exit(
-	system.native_in.blocking__(false
+	system.raw_in.blocking__(false
 	loop.run(
