@@ -11,23 +11,16 @@ read = @
 suisha.main(@(loop)
 	timers = [
 	commands = {
-		"quit": @(arguments)
-			loop.exit(
-		"echo": @(arguments)
-			print(arguments
-		"post": @(arguments)
-			loop.post(@
-				print("posted: " + arguments
-		"in": @(arguments)
-			loop.timer(@
-				print("single: " + arguments
-			, Integer(arguments.shift()), true
-		"every": @(arguments)
-			timers.push(loop.timer(@
-				print("repeat: " + arguments
-			, Integer(arguments.shift(
-		"stop": @(arguments)
-			timers.shift().stop(
+		"quit": @(arguments) loop.exit(
+		"echo": @(arguments) print(arguments
+		"post": @(arguments) loop.post(@ print("posted: " + arguments
+		"in": @(arguments) loop.timer(@
+			print("single: " + arguments
+		, Integer(arguments.shift()), true
+		"every": @(arguments) timers.push(loop.timer(@
+			print("repeat: " + arguments
+		, Integer(arguments.shift(
+		"stop": @(arguments) timers.shift().stop(
 	wait = loop.wait
 	loop.wait = @
 		print("before wait"

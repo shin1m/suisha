@@ -15,8 +15,7 @@ thread = Thread(@
 
 try
 	suisha.main(@(loop)
-		loop.poll(0, true, false, @(readable, writable)
-			if !readable: return
+		loop.poll(0, true, false, @(readable, writable) if readable
 			line = system.in.read_line(
 			if line.size() > 0
 				line = line.substring(0, line.size() - 1

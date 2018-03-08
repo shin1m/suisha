@@ -22,20 +22,20 @@ suisha.main(@(loop) dbus.main(@
 	objects = root.call(root.method("GetManagedObjects")
 	try
 		objects.each(@(path) path[1].each(@(interface)
-			if interface[0] != "org.bluez.Device1": return
+			interface[0] != "org.bluez.Device1" && return
 			address_matched = false
 			uuid_matched = false
 			try
 				interface[1].each(@(property)
 					if property[0] == "Address"
 						print("Address: " + property[1]
-						if property[1] != address: throw null
-						if uuid_matched: throw path[0]
+						property[1] != address && throw null
+						uuid_matched && throw path[0]
 						:address_matched = true
 					else if property[0] == "UUIDs"
 						try
 							property[1].each(@(uuid)
-								if uuid == UUID_SPP: throw address_matched ? path[0] : true
+								uuid == UUID_SPP && throw address_matched ? path[0] : true
 							throw null
 						catch Boolean x
 							:uuid_matched = x
@@ -55,8 +55,7 @@ suisha.main(@(loop) dbus.main(@
 			remote.file = io.File(fd, "r+"
 			remote.writer = io.Writer(remote.file, "utf-8"
 			reader = io.Reader(remote.file, "utf-8"
-			loop.poll(fd, true, false, @(readable, writable)
-				if !readable: return
+			loop.poll(fd, true, false, @(readable, writable) if readable
 				try
 					system.out.write(reader.read_line(
 					system.out.flush(
@@ -93,7 +92,7 @@ suisha.main(@(loop) dbus.main(@
 		.append(UUID_SPP
 		@(x)
 			# reply callback is not exception safe.
-			#if x.get_type() == dbus.MESSAGE_TYPE_ERROR: throw Throwable(x.get().__string(
+			#x.get_type() == dbus.MESSAGE_TYPE_ERROR && throw Throwable(x.get().__string(
 			if x.get_type() == dbus.MESSAGE_TYPE_ERROR
 				print(x.get(
 				loop.exit(

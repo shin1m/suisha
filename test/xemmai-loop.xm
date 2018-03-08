@@ -2,7 +2,7 @@ system = Module("system"
 print = system.out.write_line
 io = Module("io"
 os = Module("os"
-assert = @(x) if !x: throw Throwable("Assertion failed."
+assert = @(x) x || throw Throwable("Assertion failed."
 suisha = Module("suisha"
 
 assert(suisha.loop() === null
@@ -43,8 +43,7 @@ suisha.main(@(loop)
 	fds = os.pipe(
 	reader = io.Reader(io.File(fds[0], "r"), "utf-8"
 	try
-		loop.poll(fds[0], true, false, @(readable, writable)
-			if !readable: return
+		loop.poll(fds[0], true, false, @(readable, writable) if readable
 			log.push(reader.read_line(
 			loop.exit(
 		t = Thread(@
@@ -65,8 +64,7 @@ suisha.main(@(loop)
 	fds = os.pipe(
 	writer = io.Writer(io.File(fds[1], "w"), "utf-8"
 	try
-		loop.poll(fds[1], false, true, @(readable, writable)
-			if !writable: return
+		loop.poll(fds[1], false, true, @(readable, writable) if writable
 			writer.write_line("poll"
 			loop.exit(
 		log.share(
@@ -101,7 +99,7 @@ suisha.main(@(loop)
 	loop.timer(@
 		log.push("timer"
 		:n = n + 1
-		if n >= 3: loop.exit(
+		n < 3 || loop.exit(
 	, 100
 	loop.run(
 	assert(log == [
