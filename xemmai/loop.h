@@ -42,9 +42,9 @@ struct t_type_of<xemmaix::suisha::t_wait> : t_type
 	static void f_define(t_extension* a_extension);
 
 	using t_type::t_type;
-	virtual t_type* f_derive(t_object* a_this);
+	virtual t_type* f_derive();
 	virtual void f_finalize(t_object* a_this);
-	virtual t_scoped f_construct(t_object* a_class, t_stacked* a_stack, size_t a_n);
+	virtual t_scoped f_construct(t_stacked* a_stack, size_t a_n);
 	virtual size_t f_call(t_object* a_this, t_stacked* a_stack, size_t a_n);
 };
 
@@ -62,10 +62,10 @@ struct t_type_of<xemmaix::suisha::t_timer> : t_type
 	static void f_define(t_extension* a_extension);
 
 	using t_type::t_type;
-	virtual t_type* f_derive(t_object* a_this);
+	virtual t_type* f_derive();
 	virtual void f_scan(t_object* a_this, t_scan a_scan);
 	virtual void f_finalize(t_object* a_this);
-	virtual t_scoped f_construct(t_object* a_class, t_stacked* a_stack, size_t a_n);
+	virtual t_scoped f_construct(t_stacked* a_stack, size_t a_n);
 };
 
 template<>
@@ -121,12 +121,12 @@ struct t_type_of<suisha::t_loop> : t_type
 	}
 	static void f_define(t_extension* a_extension);
 
-	t_type_of(t_scoped&& a_module, t_scoped&& a_super) : t_type(std::move(a_module), std::move(a_super))
+	t_type_of(t_scoped&& a_module, t_type* a_super) : t_type(std::move(a_module), std::move(a_super))
 	{
 		v_shared = true;
 	}
-	virtual t_type* f_derive(t_object* a_this);
-	virtual t_scoped f_construct(t_object* a_class, t_stacked* a_stack, size_t a_n);
+	virtual t_type* f_derive();
+	virtual t_scoped f_construct(t_stacked* a_stack, size_t a_n);
 };
 
 }
