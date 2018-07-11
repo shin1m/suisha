@@ -35,21 +35,18 @@ namespace xemmai
 {
 
 template<>
-struct t_type_of<xemmaix::suisha::t_wait> : t_type
+struct t_type_of<xemmaix::suisha::t_wait> : t_uninstantiatable<t_underivable<t_holds<xemmaix::suisha::t_wait>>>
 {
 	typedef xemmaix::suisha::t_extension t_extension;
 
 	static void f_define(t_extension* a_extension);
 
-	using t_type::t_type;
-	virtual t_type* f_derive();
-	virtual void f_finalize(t_object* a_this);
-	virtual t_scoped f_construct(t_stacked* a_stack, size_t a_n);
+	using t_base::t_base;
 	virtual size_t f_call(t_object* a_this, t_stacked* a_stack, size_t a_n);
 };
 
 template<>
-struct t_type_of<xemmaix::suisha::t_timer> : t_type
+struct t_type_of<xemmaix::suisha::t_timer> : t_uninstantiatable<t_underivable<t_holds<xemmaix::suisha::t_timer>>>
 {
 	typedef xemmaix::suisha::t_extension t_extension;
 
@@ -61,15 +58,12 @@ struct t_type_of<xemmaix::suisha::t_timer> : t_type
 	}
 	static void f_define(t_extension* a_extension);
 
-	using t_type::t_type;
-	virtual t_type* f_derive();
+	using t_base::t_base;
 	virtual void f_scan(t_object* a_this, t_scan a_scan);
-	virtual void f_finalize(t_object* a_this);
-	virtual t_scoped f_construct(t_stacked* a_stack, size_t a_n);
 };
 
 template<>
-struct t_type_of<suisha::t_loop> : t_type
+struct t_type_of<suisha::t_loop> : t_uninstantiatable<t_underivable<t_with_traits<t_bears<suisha::t_loop>, false, true>>>
 {
 	template<typename T>
 	struct t_as;
@@ -121,12 +115,7 @@ struct t_type_of<suisha::t_loop> : t_type
 	}
 	static void f_define(t_extension* a_extension);
 
-	t_type_of(t_scoped&& a_module, t_type* a_super) : t_type(std::move(a_module), std::move(a_super))
-	{
-		v_shared = true;
-	}
-	virtual t_type* f_derive();
-	virtual t_scoped f_construct(t_stacked* a_stack, size_t a_n);
+	using t_base::t_base;
 };
 
 }
