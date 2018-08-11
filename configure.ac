@@ -1,9 +1,9 @@
-AC_INIT([suisha], [201807])
+AC_INIT([suisha], [201808])
 AM_INIT_AUTOMAKE([foreign nostdinc dist-bzip2 no-dist-gzip])
 AC_CONFIG_SRCDIR([src/loop.cc])
 
 PKG_CHECK_MODULES([DBUS], [dbus-1 >= 1.4])
-XEMMAI_USE=xemmai-201807
+XEMMAI_USE=xemmai-201808
 PKG_CHECK_MODULES([XEMMAI], [${XEMMAI_USE}], [
 	XEMMAI_BIN_PATH=`pkg-config --variable=bin_path ${XEMMAI_USE}`
 	XEMMAI_MODULE_PATH=`pkg-config --variable=module_path ${XEMMAI_USE}`

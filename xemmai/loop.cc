@@ -8,9 +8,9 @@ void t_type_of<xemmaix::suisha::t_wait>::f_define(t_extension* a_extension)
 	t_define<xemmaix::suisha::t_wait, t_object>(a_extension, L"Wait");
 }
 
-size_t t_type_of<xemmaix::suisha::t_wait>::f_call(t_object* a_this, t_stacked* a_stack, size_t a_n)
+size_t t_type_of<xemmaix::suisha::t_wait>::f_do_call(t_object* a_this, t_stacked* a_stack, size_t a_n)
 {
-	if (a_n > 0) t_throwable::f_throw(a_stack, a_n, L"must be called without an argument.");
+	if (a_n > 0) f_throw(a_stack, a_n, L"must be called without an argument.");
 	a_stack[1].f_destruct();
 	f_as<xemmaix::suisha::t_wait&>(a_this).v_wait();
 	a_stack[0].f_construct();
@@ -25,7 +25,7 @@ void t_type_of<xemmaix::suisha::t_timer>::f_define(t_extension* a_extension)
 	;
 }
 
-void t_type_of<xemmaix::suisha::t_timer>::f_scan(t_object* a_this, t_scan a_scan)
+void t_type_of<xemmaix::suisha::t_timer>::f_do_scan(t_object* a_this, t_scan a_scan)
 {
 	a_scan(f_as<xemmaix::suisha::t_timer&>(a_this).v_callable);
 }

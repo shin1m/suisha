@@ -42,7 +42,7 @@ struct t_type_of<xemmaix::suisha::t_wait> : t_uninstantiatable<t_underivable<t_h
 	static void f_define(t_extension* a_extension);
 
 	using t_base::t_base;
-	virtual size_t f_call(t_object* a_this, t_stacked* a_stack, size_t a_n);
+	static size_t f_do_call(t_object* a_this, t_stacked* a_stack, size_t a_n);
 };
 
 template<>
@@ -59,7 +59,7 @@ struct t_type_of<xemmaix::suisha::t_timer> : t_uninstantiatable<t_underivable<t_
 	static void f_define(t_extension* a_extension);
 
 	using t_base::t_base;
-	virtual void f_scan(t_object* a_this, t_scan a_scan);
+	static void f_do_scan(t_object* a_this, t_scan a_scan);
 };
 
 template<>
@@ -74,7 +74,7 @@ struct t_type_of<suisha::t_loop> : t_uninstantiatable<t_underivable<t_with_trait
 		static T0* f_call(T1&& a_object)
 		{
 			auto p = static_cast<T0*>(f_object(std::forward<T1>(a_object))->f_pointer());
-			if (!p) t_throwable::f_throw(L"already destroyed.");
+			if (!p) f_throw(L"already destroyed.");
 			return p;
 		}
 	};
