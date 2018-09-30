@@ -7,10 +7,7 @@
 #include <string>
 #include <suisha/dbus.h>
 
-namespace suisha
-{
-
-namespace dbus
+namespace suisha::dbus
 {
 
 class t_connection;
@@ -231,8 +228,6 @@ public:
 		return v_i;
 	}
 };
-
-}
 
 }
 

@@ -5,6 +5,12 @@ os = Module("os"
 assert = @(x) x || throw Throwable("Assertion failed."
 suisha = Module("suisha"
 
+array_equals = @(x, y)
+	n = x.size()
+	n == y.size() || return false
+	for i = 0; i < n; i = i + 1:x[i] == y[i] || return false
+	true
+
 assert(suisha.loop() === null
 suisha.main(@(loop)
 	assert(suisha.loop() === loop
@@ -24,7 +30,7 @@ suisha.main(@(loop)
 		log.push("post"
 		loop.exit(
 	loop.run(
-	assert(log == [
+	assert(array_equals(log, [
 		"wait"
 		"post"
 suisha.main(@(loop)
@@ -35,7 +41,7 @@ suisha.main(@(loop)
 			loop.exit(
 	loop.run(
 	t.join(
-	assert(log == [
+	assert(array_equals(log, [
 		"wait"
 		"post"
 suisha.main(@(loop)
@@ -56,7 +62,7 @@ suisha.main(@(loop)
 		t.join(
 	finally
 		reader.close(
-	assert(log == [
+	assert(array_equals(log, [
 		"wait"
 		"poll\n"
 suisha.main(@(loop)
@@ -80,7 +86,7 @@ suisha.main(@(loop)
 		t.join(
 	finally
 		writer.close(
-	assert(log == [
+	assert(array_equals(log, [
 		"wait"
 		"poll\n"
 suisha.main(@(loop)
@@ -90,7 +96,7 @@ suisha.main(@(loop)
 		loop.exit(
 	, 100, true
 	loop.run(
-	assert(log == [
+	assert(array_equals(log, [
 		"wait"
 		"timer"
 suisha.main(@(loop)
@@ -102,7 +108,7 @@ suisha.main(@(loop)
 		n < 3 || loop.exit(
 	, 100
 	loop.run(
-	assert(log == [
+	assert(array_equals(log, [
 		"wait"
 		"timer"
 		"wait"

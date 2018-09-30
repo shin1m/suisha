@@ -3,6 +3,7 @@
 #include <map>
 #include <suisha/loop.h>
 
+using namespace std::literals;
 using namespace suisha;
 
 int main(int argc, char* argv[])
@@ -10,52 +11,52 @@ int main(int argc, char* argv[])
 	t_loop loop;
 	loop.v_wait = [wait = std::move(loop.v_wait)]
 	{
-		std::cout << "before wait" << std::endl;
+		std::cout << "before wait"sv << std::endl;
 		wait();
-		std::cout << "after wait" << std::endl;
+		std::cout << "after wait"sv << std::endl;
 	};
 	std::deque<std::shared_ptr<t_timer>> timers;
 	std::map<std::string, std::function<void()>> commands = {
-		{"quit", [&]
+		{"quit"s, [&]
 		{
 			loop.f_exit();
 		}},
-		{"echo", []
+		{"echo"s, []
 		{
 			std::string value;
 			std::cin >> value;
 			std::cout << value << std::endl;
 		}},
-		{"post", [&]
+		{"post"s, [&]
 		{
 			std::string value;
 			std::cin >> value;
 			loop.f_post([value]
 			{
-				std::cout << "posted: " << value << std::endl;
+				std::cout << "posted: "sv << value << std::endl;
 			});
 		}},
-		{"in", [&]
+		{"in"s, [&]
 		{
 			size_t interval;
 			std::string value;
 			std::cin >> interval >> value;
 			loop.f_timer([value]
 			{
-				std::cout << "single: " << value << std::endl;
+				std::cout << "single: "sv << value << std::endl;
 			}, interval, true);
 		}},
-		{"every", [&]
+		{"every"s, [&]
 		{
 			size_t interval;
 			std::string value;
 			std::cin >> interval >> value;
 			timers.push_back(loop.f_timer([value]
 			{
-				std::cout << "repeat: " << value << std::endl;
+				std::cout << "repeat: "sv << value << std::endl;
 			}, interval));
 		}},
-		{"stop", [&]
+		{"stop"s, [&]
 		{
 			timers.front()->f_stop();
 			timers.pop_front();
@@ -69,14 +70,14 @@ int main(int argc, char* argv[])
 			std::cin >> command;
 			auto i = commands.find(command);
 			if (i == commands.end())
-				std::cerr << "unknown command: " << command << std::endl;
+				std::cerr << "unknown command: "sv << command << std::endl;
 			else
 				i->second();
 		});
 		loop.f_run();
 		return EXIT_SUCCESS;
 	} catch (std::exception& e) {
-		std::cerr << "Error: " << e.what() << std::endl;
+		std::cerr << "Error: "sv << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
 }

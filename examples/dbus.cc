@@ -1,9 +1,6 @@
 #include "dbus.h"
 
-namespace suisha
-{
-
-namespace dbus
+namespace suisha::dbus
 {
 
 void t_message::f_get(int a_type, ...) const
@@ -139,8 +136,6 @@ void t_connection::f_remove_match(int a_type, const std::string& a_path, const s
 		dbus_error_free(&error);
 		throw std::runtime_error("dbus_bus_remove_match failed: " + s);
 	}
-}
-
 }
 
 }

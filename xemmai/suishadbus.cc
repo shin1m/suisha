@@ -15,7 +15,7 @@ struct t_extension : xemmai::t_extension
 {
 	t_extension(t_object* a_module) : xemmai::t_extension(a_module)
 	{
-		f_define<void(*)(xemmaix::dbus::t_connection&), f_watch>(this, L"watch");
+		f_define<void(*)(xemmaix::dbus::t_connection&), f_watch>(this, L"watch"sv);
 	}
 	virtual void f_scan(t_scan a_scan)
 	{

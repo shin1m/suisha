@@ -2,7 +2,7 @@ xemmaidir = $(XEMMAI_MODULE_PATH)
 
 xemmai_LTLIBRARIES = suisha.la suishadbus.la
 AM_CPPFLAGS = -I$(top_srcdir)/include $(DBUS_CFLAGS) $(XEMMAI_CFLAGS)
-AM_CXXFLAGS =
+AM_CXXFLAGS = -std=c++17
 AM_LDFLAGS = -module -avoid-version
 if DEBUG
 AM_CXXFLAGS += -g

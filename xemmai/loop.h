@@ -52,7 +52,7 @@ struct t_type_of<xemmaix::suisha::t_timer> : t_uninstantiatable<t_underivable<t_
 
 	static t_scoped f_transfer(const t_extension* a_extension, xemmaix::suisha::t_timer* a_value)
 	{
-		auto object = t_object::f_allocate(a_extension->f_type<xemmaix::suisha::t_timer>());
+		auto object = t_object::f_allocate(a_extension->f_type<xemmaix::suisha::t_timer>(), false);
 		object.f_pointer__(a_value);
 		return object;
 	}
@@ -63,7 +63,7 @@ struct t_type_of<xemmaix::suisha::t_timer> : t_uninstantiatable<t_underivable<t_
 };
 
 template<>
-struct t_type_of<suisha::t_loop> : t_uninstantiatable<t_underivable<t_with_traits<t_bears<suisha::t_loop>, false, true>>>
+struct t_type_of<suisha::t_loop> : t_uninstantiatable<t_underivable<t_bears<suisha::t_loop>>>
 {
 	template<typename T>
 	struct t_as;
@@ -74,7 +74,7 @@ struct t_type_of<suisha::t_loop> : t_uninstantiatable<t_underivable<t_with_trait
 		static T0* f_call(T1&& a_object)
 		{
 			auto p = static_cast<T0*>(f_object(std::forward<T1>(a_object))->f_pointer());
-			if (!p) f_throw(L"already destroyed.");
+			if (!p) f_throw(L"already destroyed."sv);
 			return p;
 		}
 	};

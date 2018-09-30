@@ -3,11 +3,13 @@
 #include <thread>
 #include <cassert>
 
+using namespace std::literals;
+
 template<typename T_container>
 std::string f_join(const T_container& a_container)
 {
-	return std::accumulate(a_container.begin(), a_container.end(), std::string(R"(
-)"), [](auto a_value, auto a_x)
+	return std::accumulate(a_container.begin(), a_container.end(), R"(
+)"s, [](auto a_value, auto a_x)
 	{
 		return a_value + a_x + R"(
 )";
@@ -20,7 +22,7 @@ void f_log(suisha::t_loop& a_loop, T_container& a_container)
 	a_container.clear();
 	a_loop.v_wait = [&, wait = std::move(a_loop.v_wait)]
 	{
-		a_container.emplace_back("wait");
+		a_container.emplace_back("wait"sv);
 		wait();
 	};
 }
@@ -31,7 +33,7 @@ int main(int argc, char* argv[])
 		suisha::f_loop();
 		assert(false);
 	} catch (std::runtime_error& e) {
-		assert(std::string(e.what()) == "no loop.");
+		assert(e.what() == "no loop."sv);
 	}
 	{
 		suisha::t_loop loop;
@@ -41,7 +43,7 @@ int main(int argc, char* argv[])
 		suisha::f_loop();
 		assert(false);
 	} catch (std::runtime_error& e) {
-		assert(std::string(e.what()) == "no loop.");
+		assert(e.what() == "no loop."sv);
 	}
 	std::vector<std::string> log;
 	{
@@ -49,14 +51,14 @@ int main(int argc, char* argv[])
 		f_log(loop, log);
 		loop.f_post([&]
 		{
-			log.emplace_back("post");
+			log.emplace_back("post"sv);
 			loop.f_exit();
 		});
 		loop.f_run();
 		assert(f_join(log) == R"(
 wait
 post
-)");
+)"sv);
 	}
 	{
 		suisha::t_loop loop;
@@ -65,7 +67,7 @@ post
 		{
 			loop.f_post([&]
 			{
-				log.emplace_back("post");
+				log.emplace_back("post"sv);
 				loop.f_exit();
 			});
 		});
@@ -74,7 +76,7 @@ post
 		assert(f_join(log) == R"(
 wait
 post
-)");
+)"sv);
 	}
 	{
 		suisha::t_loop loop;
@@ -100,7 +102,7 @@ post
 		assert(f_join(log) == R"(
 wait
 poll
-)");
+)"sv);
 	}
 	{
 		suisha::t_loop loop;
@@ -126,21 +128,21 @@ poll
 		assert(f_join(log) == R"(
 wait
 poll
-)");
+)"sv);
 	}
 	{
 		suisha::t_loop loop;
 		f_log(loop, log);
 		loop.f_timer([&]
 		{
-			log.emplace_back("timer");
+			log.emplace_back("timer"sv);
 			loop.f_exit();
 		}, 100, true);
 		loop.f_run();
 		assert(f_join(log) == R"(
 wait
 timer
-)");
+)"sv);
 	}
 	{
 		suisha::t_loop loop;
@@ -148,7 +150,7 @@ timer
 		size_t n = 0;
 		loop.f_timer([&]
 		{
-			log.emplace_back("timer");
+			log.emplace_back("timer"sv);
 			if (++n >= 3) loop.f_exit();
 		}, 100);
 		loop.f_run();
@@ -159,7 +161,7 @@ wait
 timer
 wait
 timer
-)");
+)"sv);
 	}
 	return 0;
 }
