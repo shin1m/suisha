@@ -10,6 +10,10 @@ namespace xemmaix::suisha
 struct t_wait
 {
 	std::function<void()> v_wait;
+
+	t_wait(std::function<void()>&& a_wait) : v_wait(std::move(a_wait))
+	{
+	}
 };
 
 struct t_timer
@@ -50,12 +54,6 @@ struct t_type_of<xemmaix::suisha::t_timer> : t_uninstantiatable<t_underivable<t_
 {
 	typedef xemmaix::suisha::t_extension t_extension;
 
-	static t_scoped f_transfer(const t_extension* a_extension, xemmaix::suisha::t_timer* a_value)
-	{
-		auto object = t_object::f_allocate(a_extension->f_type<xemmaix::suisha::t_timer>(), false);
-		object.f_pointer__(a_value);
-		return object;
-	}
 	static void f_define(t_extension* a_extension);
 
 	using t_base::t_base;
@@ -73,7 +71,7 @@ struct t_type_of<suisha::t_loop> : t_uninstantiatable<t_underivable<t_bears<suis
 		template<typename T1>
 		static T0* f_call(T1&& a_object)
 		{
-			auto p = static_cast<T0*>(f_object(std::forward<T1>(a_object))->f_pointer());
+			auto p = f_object(std::forward<T1>(a_object))->template f_as<T0*>();
 			if (!p) f_throw(L"already destroyed."sv);
 			return p;
 		}
@@ -105,13 +103,13 @@ struct t_type_of<suisha::t_loop> : t_uninstantiatable<t_underivable<t_bears<suis
 			callable(f_global()->f_as(a_readable), f_global()->f_as(a_writable));
 		});
 	}
-	static xemmaix::suisha::t_timer* f_timer(suisha::t_loop& a_self, t_scoped&& a_callable, size_t a_interval, bool a_single)
+	static t_scoped f_timer(t_extension* a_extension, suisha::t_loop& a_self, t_scoped&& a_callable, size_t a_interval, bool a_single)
 	{
-		return new xemmaix::suisha::t_timer(a_self, std::move(a_callable), a_interval, a_single);
+		return xemmai::f_new<xemmaix::suisha::t_timer>(a_extension, false, a_self, std::move(a_callable), a_interval, a_single);
 	}
-	static xemmaix::suisha::t_timer* f_timer(suisha::t_loop& a_self, t_scoped&& a_callable, size_t a_interval)
+	static t_scoped f_timer(t_extension* a_extension, suisha::t_loop& a_self, t_scoped&& a_callable, size_t a_interval)
 	{
-		return new xemmaix::suisha::t_timer(a_self, std::move(a_callable), a_interval, false);
+		return xemmai::f_new<xemmaix::suisha::t_timer>(a_extension, false, a_self, std::move(a_callable), a_interval, false);
 	}
 	static void f_define(t_extension* a_extension);
 

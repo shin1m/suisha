@@ -42,8 +42,8 @@ void t_type_of<suisha::t_loop>::f_define(t_extension* a_extension)
 		(L"poll"sv, t_member<void(*)(t_loop&, int, bool, bool, t_scoped&&), f_poll>())
 		(L"unpoll"sv, t_member<void(t_loop::*)(int), &t_loop::f_unpoll>())
 		(L"timer"sv,
-			t_member<xemmaix::suisha::t_timer*(*)(t_loop&, t_scoped&&, size_t), f_timer>(),
-			t_member<xemmaix::suisha::t_timer*(*)(t_loop&, t_scoped&&, size_t, bool), f_timer>()
+			t_member<t_scoped(*)(t_extension*, t_loop&, t_scoped&&, size_t), f_timer>(),
+			t_member<t_scoped(*)(t_extension*, t_loop&, t_scoped&&, size_t, bool), f_timer>()
 		)
 	;
 }

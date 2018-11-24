@@ -18,14 +18,13 @@ t_scoped f_loop()
 void t_extension::f_main(t_extension* a_extension, const t_value& a_callable)
 {
 	t_loop loop;
-	v_loop = t_object::f_allocate(a_extension->f_type<t_loop>(), true);
-	v_loop.f_pointer__(&loop);
-	auto wait = t_object::f_allocate(a_extension->f_type<t_wait>(), false);
-	wait.f_pointer__(new t_wait{[wait = std::move(loop.v_wait)]
+	v_loop = t_object::f_allocate(a_extension->f_type<t_loop>(), true, sizeof(t_loop*));
+	v_loop->f_as<t_loop*>() = &loop;
+	auto wait = f_new<t_wait>(a_extension, false, [wait = std::move(loop.v_wait)]
 	{
 		t_safe_region region;
 		wait();
-	}});
+	});
 	auto symbol_wait = t_symbol::f_instantiate(L"wait"sv);
 	v_loop.f_put(symbol_wait, std::move(wait));
 	loop.v_wait = [&]
@@ -38,7 +37,7 @@ void t_extension::f_main(t_extension* a_extension, const t_value& a_callable)
 	auto finalize = [&]
 	{
 		t_with_lock_for_write lock(v_loop);
-		v_loop.f_pointer__(nullptr);
+		v_loop->f_as<t_loop*>() = nullptr;
 		v_loop = nullptr;
 	};
 	try {
