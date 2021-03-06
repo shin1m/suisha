@@ -68,24 +68,23 @@ suisha.main(@(loop)
 suisha.main(@(loop)
 	log = setup(loop
 	fds = os.pipe(
-	writer = io.Writer(io.File(fds[1], "w"), "utf-8"
-	try
-		loop.poll(fds[1], false, true, @(readable, writable) if writable
+	loop.poll(fds[1], false, true, @(readable, writable) if writable
+		writer = io.Writer(io.File(fds[1], "w"), "utf-8"
+		try
 			writer.write_line("poll"
 			loop.exit(
-		log.share(
-		t = Thread(@
-			file = io.File(fds[0], "r"
-			file.blocking__(false
-			reader = io.Reader(file, "utf-8"
-			try
-				log.push(reader.read_line(
-			finally
-				reader.close(
-		loop.run(
-		t.join(
-	finally
-		writer.close(
+		finally
+			loop.unpoll(fds[1]
+			writer.close(
+	log.share(
+	t = Thread(@
+		reader = io.Reader(io.File(fds[0], "r"), "utf-8"
+		try
+			log.push(reader.read_line(
+		finally
+			reader.close(
+	loop.run(
+	t.join(
 	assert(array_equals(log, [
 		"wait"
 		"poll\n"
@@ -105,10 +104,20 @@ suisha.main(@(loop)
 	loop.timer(@
 		log.push("timer"
 		:n = n + 1
-		n < 3 || loop.exit(
+		n < 8 || loop.exit(
 	, 100
 	loop.run(
 	assert(array_equals(log, [
+		"wait"
+		"timer"
+		"wait"
+		"timer"
+		"wait"
+		"timer"
+		"wait"
+		"timer"
+		"wait"
+		"timer"
 		"wait"
 		"timer"
 		"wait"

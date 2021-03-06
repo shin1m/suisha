@@ -1,0 +1,7 @@
+function(add_module name)
+	add_library(${name}-xemmai MODULE ${ARGN})
+	target_link_libraries(${name}-xemmai PRIVATE ${name} xemmai)
+	set_target_properties(${name}-xemmai PROPERTIES OUTPUT_NAME ${name} PREFIX "")
+endfunction()
+add_module(suisha loop.cc suisha.cc)
+add_module(suishadbus suishadbus.cc)

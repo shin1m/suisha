@@ -18,18 +18,17 @@ struct t_wait
 
 struct t_timer
 {
-	t_slot v_callable;
-	std::shared_ptr<::suisha::t_timer> v_timer;
+	std::weak_ptr<::suisha::t_timer> v_timer;
 
-	t_timer(t_loop& a_loop, t_scoped&& a_callable, size_t a_interval, bool a_single) : v_callable(std::move(a_callable)), v_timer(a_loop.f_timer([this]
+	t_timer(t_loop& a_loop, const t_pvalue& a_callable, size_t a_interval, bool a_single) : v_timer(a_loop.f_timer([this, callable = t_rvalue(a_callable)]
 	{
-		v_callable();
+		callable();
 	}, a_interval, a_single))
 	{
 	}
 	void f_stop()
 	{
-		v_timer->f_stop();
+		if (auto p = v_timer.lock()) p->f_stop();
 	}
 };
 
@@ -46,7 +45,7 @@ struct t_type_of<xemmaix::suisha::t_wait> : t_uninstantiatable<t_underivable<t_h
 	static void f_define(t_extension* a_extension);
 
 	using t_base::t_base;
-	static size_t f_do_call(t_object* a_this, t_stacked* a_stack, size_t a_n);
+	static size_t f_do_call(t_object* a_this, t_pvalue* a_stack, size_t a_n);
 };
 
 template<>
@@ -57,7 +56,6 @@ struct t_type_of<xemmaix::suisha::t_timer> : t_uninstantiatable<t_underivable<t_
 	static void f_define(t_extension* a_extension);
 
 	using t_base::t_base;
-	static void f_do_scan(t_object* a_this, t_scan a_scan);
 };
 
 template<>
@@ -87,29 +85,29 @@ struct t_type_of<suisha::t_loop> : t_uninstantiatable<t_underivable<t_bears<suis
 	};
 	typedef xemmaix::suisha::t_extension t_extension;
 
-	static void f_post(suisha::t_loop& a_self, t_scoped&& a_callable)
+	static void f_post(suisha::t_loop& a_self, const t_pvalue& a_callable)
 	{
 		t_thread::f_cache_release();
-		a_self.f_post([callable = std::move(a_callable)]
+		a_self.f_post([callable = t_rvalue(a_callable)]
 		{
 			t_thread::f_cache_acquire();
 			callable();
 		});
 	}
-	static void f_poll(suisha::t_loop& a_self, int a_descriptor, bool a_read, bool a_write, t_scoped&& a_callable)
+	static void f_poll(suisha::t_loop& a_self, int a_descriptor, bool a_read, bool a_write, const t_pvalue& a_callable)
 	{
-		a_self.f_poll(a_descriptor, a_read, a_write, [callable = std::move(a_callable)](bool a_readable, bool a_writable)
+		a_self.f_poll(a_descriptor, a_read, a_write, [callable = t_rvalue(a_callable)](bool a_readable, bool a_writable)
 		{
 			callable(f_global()->f_as(a_readable), f_global()->f_as(a_writable));
 		});
 	}
-	static t_scoped f_timer(t_extension* a_extension, suisha::t_loop& a_self, t_scoped&& a_callable, size_t a_interval, bool a_single)
+	static t_pvalue f_timer(t_extension* a_extension, suisha::t_loop& a_self, const t_pvalue& a_callable, size_t a_interval, bool a_single)
 	{
-		return xemmai::f_new<xemmaix::suisha::t_timer>(a_extension, false, a_self, std::move(a_callable), a_interval, a_single);
+		return xemmai::f_new<xemmaix::suisha::t_timer>(a_extension, false, a_self, a_callable, a_interval, a_single);
 	}
-	static t_scoped f_timer(t_extension* a_extension, suisha::t_loop& a_self, t_scoped&& a_callable, size_t a_interval)
+	static t_pvalue f_timer(t_extension* a_extension, suisha::t_loop& a_self, const t_pvalue& a_callable, size_t a_interval)
 	{
-		return xemmai::f_new<xemmaix::suisha::t_timer>(a_extension, false, a_self, std::move(a_callable), a_interval, false);
+		return xemmai::f_new<xemmaix::suisha::t_timer>(a_extension, false, a_self, a_callable, a_interval, false);
 	}
 	static void f_define(t_extension* a_extension);
 

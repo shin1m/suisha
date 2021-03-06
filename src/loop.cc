@@ -48,17 +48,20 @@ t_loop::t_loop()
 	v_post = fds[1];
 	v_wait = [this]
 	{
-		int timeout = -1;
-		if (v_more) {
-			v_more = false;
-			timeout = 0;
-		} else if (v_timer) {
-			timeval tv;
-			gettimeofday(&tv, NULL);
-			timersub(&v_timer->v_time, &tv, &tv);
-			timeout = std::max<int>(tv.tv_sec * 1000 + (tv.tv_usec + 999) / 1000, 0);
+		while (true) {
+			int timeout = -1;
+			if (v_more) {
+				v_more = false;
+				timeout = 0;
+			} else if (v_timer) {
+				timeval tv;
+				gettimeofday(&tv, NULL);
+				timersub(&v_timer->v_time, &tv, &tv);
+				timeout = std::max<int>(tv.tv_sec * 1000 + (tv.tv_usec + 999) / 1000, 0);
+			}
+			if (poll(&v_pollfds[0], v_pollfds.size(), timeout) != -1) break;
+			if (errno != EINTR) throw errno;
 		}
-		poll(&v_pollfds[0], v_pollfds.size(), timeout);
 	};
 	v_instance = this;
 }
@@ -67,7 +70,7 @@ t_loop::~t_loop()
 {
 	v_instance = nullptr;
 	while (true) {
-		poll(&v_pollfds[0], 1, 0);
+		while (poll(&v_pollfds[0], 1, 0) == -1) if (errno != EINTR) throw errno;
 		if (v_pollfds[0].revents != POLLIN) break;
 		f_unpost();
 	}
@@ -115,7 +118,7 @@ void t_loop::f_run()
 			}
 			if (!v_more) break;
 			v_more = false;
-			poll(v_pollfds.data(), v_pollfds.size(), 0);
+			while (poll(v_pollfds.data(), v_pollfds.size(), 0) == -1) if (errno != EINTR) throw errno;
 			if (v_loop < current) return;
 		}
 	}
