@@ -11,20 +11,23 @@ void f_watch(xemmaix::dbus::t_connection& a_connection)
 	new suisha::dbus::t_bridge(a_connection);
 }
 
-struct t_extension : xemmai::t_extension
+struct t_library : xemmai::t_library
 {
-	t_extension(t_object* a_module) : xemmai::t_extension(a_module)
-	{
-		f_define<void(*)(xemmaix::dbus::t_connection&), f_watch>(this, L"watch"sv);
-	}
+	using xemmai::t_library::t_library;
 	virtual void f_scan(t_scan a_scan)
 	{
+	}
+	virtual std::vector<std::pair<t_root, t_rvalue>> f_define()
+	{
+		return t_define(this)
+			(L"watch"sv, t_static<void(*)(xemmaix::dbus::t_connection&), f_watch>())
+		;
 	}
 };
 
 }
 
-XEMMAI__MODULE__FACTORY(xemmai::t_object* a_module)
+XEMMAI__MODULE__FACTORY(xemmai::t_library::t_handle* a_handle)
 {
-	return new xemmaix::suishadbus::t_extension(a_module);
+	return xemmai::f_new<xemmaix::suishadbus::t_library>(a_handle);
 }

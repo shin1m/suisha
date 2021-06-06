@@ -15,30 +15,29 @@ t_pvalue f_loop()
 
 }
 
-void t_extension::f_main(t_extension* a_extension, const t_pvalue& a_callable)
+void t_library::f_main(t_library* a_library, const t_pvalue& a_callable)
 {
-	t_loop loop;
-	v_loop = f_engine()->f_allocate(true, sizeof(t_loop*));
-	v_loop->f_as<t_loop*>() = &loop;
-	v_loop->f_be(a_extension->f_type<t_loop>());
-	auto wait = f_new<t_wait>(a_extension, false, [wait = std::move(loop.v_wait)]
+	::suisha::t_loop loop;
+	v_loop = f_new<t_loop>(a_library, loop);
+	auto wait = f_new<t_wait>(a_library, [wait = std::move(loop.v_wait)]
 	{
 		t_safe_region region;
 		wait();
 	});
-	auto symbol_wait = t_symbol::f_instantiate(L"wait"sv);
-	v_loop->f_put(symbol_wait, wait);
+	v_loop->f_fields()[0/*wait*/] = wait;
 	loop.v_wait = [&]
 	{
-		t_scoped_stack stack(2);
-		stack[1] = nullptr;
-		v_loop->f_call(symbol_wait, stack, 0);
+		v_loop->f_fields()[0/*wait*/]();
 	};
 	auto finalize = [&]
 	{
-		t_with_lock_for_write lock(v_loop);
-		v_loop->f_as<t_loop*>() = nullptr;
+		auto& loop = v_loop->f_as<t_loop>();
+		std::lock_guard lock(loop.v_mutex);
+		loop.v_loop = nullptr;
 		v_loop = nullptr;
+		wait->f_as<t_wait>().v_wait = []
+		{
+		};
 	};
 	try {
 		a_callable(v_loop);
@@ -49,25 +48,30 @@ void t_extension::f_main(t_extension* a_extension, const t_pvalue& a_callable)
 	}
 }
 
-t_extension::t_extension(t_object* a_module) : xemmai::t_extension(a_module)
-{
-	t_type_of<t_wait>::f_define(this);
-	t_type_of<t_timer>::f_define(this);
-	t_type_of<t_loop>::f_define(this);
-	f_define<void(*)(t_extension*, const t_pvalue&), f_main>(this, L"main"sv);
-	f_define<t_pvalue(*)(), f_loop>(this, L"loop"sv);
-}
-
-void t_extension::f_scan(t_scan a_scan)
+void t_library::f_scan(t_scan a_scan)
 {
 	a_scan(v_type_wait);
 	a_scan(v_type_timer);
 	a_scan(v_type_loop);
 }
 
+std::vector<std::pair<t_root, t_rvalue>> t_library::f_define()
+{
+	t_type_of<t_wait>::f_define(this);
+	t_type_of<t_timer>::f_define(this);
+	t_type_of<t_loop>::f_define(this);
+	return t_define(this)
+		(L"Wait"sv, t_object::f_of(v_type_wait))
+		(L"Timer"sv, t_object::f_of(v_type_timer))
+		(L"Loop"sv, t_object::f_of(v_type_loop))
+		(L"main"sv, t_static<void(*)(t_library*, const t_pvalue&), f_main>())
+		(L"loop"sv, t_static<t_pvalue(*)(), f_loop>())
+	;
 }
 
-XEMMAI__MODULE__FACTORY(xemmai::t_object* a_module)
+}
+
+XEMMAI__MODULE__FACTORY(xemmai::t_library::t_handle* a_handle)
 {
-	return new xemmaix::suisha::t_extension(a_module);
+	return xemmai::f_new<xemmaix::suisha::t_library>(a_handle);
 }

@@ -12,20 +12,22 @@ using namespace xemmai;
 
 class t_wait;
 class t_timer;
+class t_loop;
 
-class t_extension : public xemmai::t_extension
+class t_library : public xemmai::t_library
 {
 	t_slot_of<t_type> v_type_wait;
 	t_slot_of<t_type> v_type_timer;
 	t_slot_of<t_type> v_type_loop;
 
-	static void f_main(t_extension* a_extension, const t_pvalue& a_callable);
+	static void f_main(t_library* a_library, const t_pvalue& a_callable);
 
 public:
-	t_extension(t_object* a_module);
+	using xemmai::t_library::t_library;
 	virtual void f_scan(t_scan a_scan);
+	virtual std::vector<std::pair<t_root, t_rvalue>> f_define();
 	template<typename T>
-	const T* f_extension() const
+	const T* f_library() const
 	{
 		return f_global();
 	}
@@ -37,39 +39,25 @@ public:
 	template<typename T>
 	t_type* f_type() const
 	{
-		return const_cast<t_extension*>(this)->f_type_slot<T>();
+		return const_cast<t_library*>(this)->f_type_slot<T>();
 	}
 	template<typename T>
 	t_pvalue f_as(T&& a_value) const
 	{
 		typedef t_type_of<typename t_fundamental<T>::t_type> t;
-		return t::f_transfer(f_extension<typename t::t_extension>(), std::forward<T>(a_value));
+		return t::f_transfer(f_library<typename t::t_library>(), std::forward<T>(a_value));
 	}
 };
 
 template<>
-inline const t_extension* t_extension::f_extension<t_extension>() const
+inline const t_library* t_library::f_library<t_library>() const
 {
 	return this;
 }
 
-template<>
-inline t_slot_of<t_type>& t_extension::f_type_slot<t_wait>()
-{
-	return v_type_wait;
-}
-
-template<>
-inline t_slot_of<t_type>& t_extension::f_type_slot<t_timer>()
-{
-	return v_type_timer;
-}
-
-template<>
-inline t_slot_of<t_type>& t_extension::f_type_slot<t_loop>()
-{
-	return v_type_loop;
-}
+XEMMAI__LIBRARY__TYPE(t_library, wait)
+XEMMAI__LIBRARY__TYPE(t_library, timer)
+XEMMAI__LIBRARY__TYPE(t_library, loop)
 
 }
 
