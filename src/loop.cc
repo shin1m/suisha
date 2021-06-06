@@ -1,4 +1,5 @@
 #include <suisha/loop.h>
+#include <system_error>
 
 namespace suisha
 {
@@ -48,6 +49,7 @@ t_loop::t_loop()
 	v_post = fds[1];
 	v_wait = [this]
 	{
+		f_check();
 		while (true) {
 			int timeout = -1;
 			if (v_more) {
@@ -60,7 +62,7 @@ t_loop::t_loop()
 				timeout = std::max<int>(tv.tv_sec * 1000 + (tv.tv_usec + 999) / 1000, 0);
 			}
 			if (poll(&v_pollfds[0], v_pollfds.size(), timeout) != -1) break;
-			if (errno != EINTR) throw errno;
+			if (errno != EINTR) throw std::system_error(errno, std::generic_category());
 		}
 	};
 	v_instance = this;
@@ -70,7 +72,7 @@ t_loop::~t_loop()
 {
 	v_instance = nullptr;
 	while (true) {
-		while (poll(&v_pollfds[0], 1, 0) == -1) if (errno != EINTR) throw errno;
+		while (poll(&v_pollfds[0], 1, 0) == -1) if (errno != EINTR) throw std::system_error(errno, std::generic_category());
 		if (v_pollfds[0].revents != POLLIN) break;
 		f_unpost();
 	}
@@ -118,7 +120,7 @@ void t_loop::f_run()
 			}
 			if (!v_more) break;
 			v_more = false;
-			while (poll(v_pollfds.data(), v_pollfds.size(), 0) == -1) if (errno != EINTR) throw errno;
+			while (poll(v_pollfds.data(), v_pollfds.size(), 0) == -1) if (errno != EINTR) throw std::system_error(errno, std::generic_category());
 			if (v_loop < current) return;
 		}
 	}
