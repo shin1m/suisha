@@ -24,10 +24,10 @@ void t_library::f_main(t_library* a_library, const t_pvalue& a_callable)
 		t_safe_region region;
 		wait();
 	});
-	v_loop->f_fields()[0/*wait*/] = wait;
+	v_loop->f_fields()[/*wait*/0] = wait;
 	loop.v_wait = [&]
 	{
-		v_loop->f_fields()[0/*wait*/]();
+		v_loop->f_fields()[/*wait*/0]();
 	};
 	auto finalize = [&]
 	{
