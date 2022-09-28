@@ -106,7 +106,7 @@ namespace xemmai
 template<>
 struct t_type_of<xemmaix::suisha::t_wait> : t_uninstantiatable<t_holds<xemmaix::suisha::t_wait>>
 {
-	typedef xemmaix::suisha::t_library t_library;
+	using t_library = xemmaix::suisha::t_library;
 
 	static void f_define(t_library* a_library);
 
@@ -117,7 +117,7 @@ struct t_type_of<xemmaix::suisha::t_wait> : t_uninstantiatable<t_holds<xemmaix::
 template<>
 struct t_type_of<xemmaix::suisha::t_timer> : t_uninstantiatable<t_holds<xemmaix::suisha::t_timer>>
 {
-	typedef xemmaix::suisha::t_library t_library;
+	using t_library = xemmaix::suisha::t_library;
 
 	static void f_define(t_library* a_library);
 
@@ -127,7 +127,7 @@ struct t_type_of<xemmaix::suisha::t_timer> : t_uninstantiatable<t_holds<xemmaix:
 template<>
 struct t_type_of<xemmaix::suisha::t_loop> : t_uninstantiatable<t_bears<xemmaix::suisha::t_loop>>
 {
-	typedef xemmaix::suisha::t_library t_library;
+	using t_library = xemmaix::suisha::t_library;
 
 	static void f_define(t_library* a_library);
 

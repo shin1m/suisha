@@ -126,8 +126,8 @@ class t_connection
 			return v_function < a_x.v_function;
 		}
 	};
-	typedef t_slot<void (*)(void*)> t_slot_void;
-	typedef t_slot<void (*)(void*, t_message&)> t_slot_message;
+	using t_slot_void = t_slot<void (*)(void*)>;
+	using t_slot_message = t_slot<void (*)(void*, t_message&)>;
 
 	static std::string f_s(const char* a_p)
 	{
