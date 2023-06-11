@@ -58,7 +58,7 @@ public:
 	std::function<void()> v_wait;
 
 	t_loop();
-	~t_loop();
+	~t_loop() noexcept(false);
 	void f_run();
 	void f_exit()
 	{

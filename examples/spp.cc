@@ -45,8 +45,7 @@ void f_check(const dbus::t_message& a_result)
 	throw std::runtime_error(std::string(dbus_message_get_error_name(a_result)) + ": " + p);
 }
 
-template<typename T_match>
-void f_find(const dbus::t_message& a_message, const char* a_uuid, T_match a_match)
+void f_find(const dbus::t_message& a_message, const char* a_uuid, auto a_match)
 {
 	DBusMessageIter i;
 	dbus_message_iter_init(a_message, &i);

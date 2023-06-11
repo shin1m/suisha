@@ -5,8 +5,7 @@
 
 using namespace std::literals;
 
-template<typename T_container>
-std::string f_join(const T_container& a_container)
+std::string f_join(const auto& a_container)
 {
 	return std::accumulate(a_container.begin(), a_container.end(), R"(
 )"s, [](auto a_value, auto a_x)
@@ -16,8 +15,7 @@ std::string f_join(const T_container& a_container)
 	});
 }
 
-template<typename T_container>
-void f_log(suisha::t_loop& a_loop, T_container& a_container)
+void f_log(suisha::t_loop& a_loop, auto& a_container)
 {
 	a_container.clear();
 	a_loop.v_wait = [&, wait = std::move(a_loop.v_wait)]
