@@ -47,13 +47,13 @@ suisha.main(@(loop)
 suisha.main(@(loop)
 	log = setup(loop
 	fds = os.pipe(
-	reader = io.Reader(io.File(fds[0], "r"), "utf-8"
+	reader = io.Reader(io.File(fds[0], true), "utf-8"
 	try
 		loop.poll(fds[0], true, false, @(readable, writable) if readable
 			log.push(reader.read_line(
 			loop.exit(
 		t = Thread(@
-			writer = io.Writer(io.File(fds[1], "w"), "utf-8"
+			writer = io.Writer(io.File(fds[1], true), "utf-8"
 			try
 				writer.write_line("poll"
 			finally
@@ -69,7 +69,7 @@ suisha.main(@(loop)
 	log = setup(loop
 	fds = os.pipe(
 	loop.poll(fds[1], false, true, @(readable, writable) if writable
-		writer = io.Writer(io.File(fds[1], "w"), "utf-8"
+		writer = io.Writer(io.File(fds[1], true), "utf-8"
 		try
 			writer.write_line("poll"
 			loop.exit(
@@ -78,7 +78,7 @@ suisha.main(@(loop)
 			writer.close(
 	log.share(
 	t = Thread(@
-		reader = io.Reader(io.File(fds[0], "r"), "utf-8"
+		reader = io.Reader(io.File(fds[0], true), "utf-8"
 		try
 			log.push(reader.read_line(
 		finally

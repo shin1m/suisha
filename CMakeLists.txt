@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 project(suisha VERSION 202306)
 find_package(DBus1 1.8 REQUIRED)
-find_package(xemmai 202306 REQUIRED)
+find_package(xemmai 202310 REQUIRED)
 add_subdirectory(src)
 add_subdirectory(xemmai)
 enable_testing()
