@@ -79,7 +79,7 @@ struct t_loop : t_sharable
 		f_check();
 		v_loop->f_poll(a_descriptor, a_read, a_write, [callable = t_rvalue(a_callable)](bool a_readable, bool a_writable)
 		{
-			callable(f_global()->f_as(a_readable), f_global()->f_as(a_writable));
+			callable(a_readable, a_writable);
 		});
 	}
 	void f_unpoll(int a_descriptor)
