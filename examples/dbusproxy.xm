@@ -25,8 +25,8 @@ $Proxy = Class() :: @
 			a.size() > 0 ? a[0] : null
 		finally
 			message.release(
-			reply !== null && reply.release(
-			result !== null && result.release(
+			reply && reply.release(
+			result && result.release(
 	$properties = @(method, name) dbus.Message($destination, $path, dbus.INTERFACE_PROPERTIES, method).append($interface).append(name
 	$get = @(name) $call($properties("Get", name
 	$set = @(name, value) $call($properties("Set", name).append(value

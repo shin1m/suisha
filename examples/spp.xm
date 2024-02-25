@@ -44,7 +44,7 @@ suisha.main(@(loop) dbus.main(@
 	catch String device_path
 	remote = null
 	remote__ = @(fd)
-		if remote !== null
+		if remote
 			loop.unpoll(remote.fd
 			remote.file.close(
 		if fd == -1
@@ -100,7 +100,7 @@ suisha.main(@(loop) dbus.main(@
 		line = system.in.read_line(
 		if line == ""
 			loop.exit(
-		else if remote !== null
+		else if remote
 			try
 				remote.writer.write(line
 				remote.writer.flush(
