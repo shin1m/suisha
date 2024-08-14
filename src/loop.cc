@@ -29,12 +29,9 @@ std::function<void()> t_loop::f_unpost()
 void t_loop::f_queue(const std::shared_ptr<t_timer>& a_timer)
 {
 	auto time = &a_timer->v_time;
-	gettimeofday(time, NULL);
-	time->tv_usec += a_timer->v_interval * 1000;
-	time->tv_sec += time->tv_usec / 1000000;
-	time->tv_usec %= 1000000;
+	*time = std::chrono::steady_clock::now() + std::chrono::milliseconds(a_timer->v_interval);
 	auto p = &v_timer;
-	while (*p && timercmp(&(*p)->v_time, time, <=)) p = &(*p)->v_next;
+	while (*p && (*p)->v_time <= *time) p = &(*p)->v_next;
 	a_timer->v_next = std::move(*p);
 	*p = a_timer;
 }
@@ -56,10 +53,7 @@ t_loop::t_loop()
 				v_more = false;
 				timeout = 0;
 			} else if (v_timer) {
-				timeval tv;
-				gettimeofday(&tv, NULL);
-				timersub(&v_timer->v_time, &tv, &tv);
-				timeout = std::max<int>(tv.tv_sec * 1000 + (tv.tv_usec + 999) / 1000, 0);
+				timeout = std::max<int>(std::chrono::ceil<std::chrono::milliseconds>(v_timer->v_time - std::chrono::steady_clock::now()).count(), 0);
 			}
 			if (poll(v_pollfds.data(), v_pollfds.size(), timeout) >= 0) break;
 			if (errno != EAGAIN && errno != EINTR) throw std::system_error(errno, std::generic_category());
@@ -106,9 +100,7 @@ void t_loop::f_run()
 			v_notifier = 0;
 			if (v_loop < current) return;
 			while (v_timer) {
-				timeval tv;
-				gettimeofday(&tv, NULL);
-				if (timercmp(&v_timer->v_time, &tv, >)) break;
+				if (v_timer->v_time > std::chrono::steady_clock::now()) break;
 				auto p = std::move(v_timer);
 				v_timer = std::move(p->v_next);
 				if (p->v_single)
@@ -134,7 +126,7 @@ void t_loop::f_poll(int a_descriptor, bool a_read, bool a_write, std::function<v
 	if (i < v_pollfds.size()) {
 		v_listeners[i - 1] = std::move(a_listener);
 	} else {
-		struct pollfd fd;
+		pollfd fd;
 		fd.fd = a_descriptor;
 		v_pollfds.push_back(fd);
 		v_listeners.emplace_back(std::move(a_listener));

@@ -1,13 +1,13 @@
 #ifndef SUISHA__LOOP_H
 #define SUISHA__LOOP_H
 
+#include <chrono>
 #include <functional>
 #include <memory>
 #include <stdexcept>
 #include <vector>
 #include <unistd.h>
 #include <sys/poll.h>
-#include <sys/time.h>
 
 namespace suisha
 {
@@ -23,7 +23,7 @@ class t_timer
 	size_t v_interval;
 	bool v_single;
 	std::shared_ptr<t_timer> v_next;
-	timeval v_time;
+	std::chrono::steady_clock::time_point v_time;
 
 public:
 	t_timer(t_loop* a_loop, std::function<void()>&& a_function, size_t a_interval, bool a_single) : v_loop(a_loop), v_function(std::move(a_function)), v_interval(a_interval), v_single(a_single)
@@ -73,7 +73,7 @@ public:
 	void f_more()
 	{
 		f_check();
-		v_more = false;
+		v_more = true;
 	}
 	void f_post(std::function<void()>&& a_function)
 	{
