@@ -20,13 +20,13 @@ class t_timer
 
 	t_loop* v_loop;
 	std::function<void()> v_function;
-	size_t v_interval;
+	std::chrono::milliseconds v_interval;
 	bool v_single;
 	std::shared_ptr<t_timer> v_next;
 	std::chrono::steady_clock::time_point v_time;
 
 public:
-	t_timer(t_loop* a_loop, std::function<void()>&& a_function, size_t a_interval, bool a_single) : v_loop(a_loop), v_function(std::move(a_function)), v_interval(a_interval), v_single(a_single)
+	t_timer(t_loop* a_loop, std::function<void()>&& a_function, const std::chrono::milliseconds& a_interval, bool a_single) : v_loop(a_loop), v_function(std::move(a_function)), v_interval(a_interval), v_single(a_single)
 	{
 	}
 	void f_stop();
@@ -35,7 +35,7 @@ public:
 class t_loop
 {
 	friend class t_timer;
-	friend t_loop* f_loop();
+	friend t_loop& f_loop();
 
 	static thread_local t_loop* v_instance;
 
@@ -52,6 +52,19 @@ class t_loop
 		if (this != v_instance) throw std::runtime_error("no owner thread.");
 	}
 	std::function<void()> f_unpost();
+	size_t f_find(int a_descriptor)
+	{
+		f_check();
+		size_t i = 1;
+		while (i < v_pollfds.size() && v_pollfds[i].fd != a_descriptor) ++i;
+		return i;
+	}
+	void f_poll(size_t a_i, bool a_read, bool a_write)
+	{
+		v_pollfds[a_i].events = 0;
+		if (a_read) v_pollfds[a_i].events |= POLLIN;
+		if (a_write) v_pollfds[a_i].events |= POLLOUT;
+	}
 	void f_queue(const std::shared_ptr<t_timer>& a_timer);
 
 public:
@@ -81,8 +94,9 @@ public:
 		write(v_post, &p, sizeof(p));
 	}
 	void f_poll(int a_descriptor, bool a_read, bool a_write, std::function<void(bool, bool)>&& a_listener);
+	void f_poll(int a_descriptor, bool a_read, bool a_write);
 	void f_unpoll(int a_descriptor);
-	std::shared_ptr<t_timer> f_timer(std::function<void()>&& a_function, size_t a_interval, bool a_single = false)
+	std::shared_ptr<t_timer> f_timer(std::function<void()>&& a_function, const std::chrono::milliseconds& a_interval, bool a_single = false)
 	{
 		f_check();
 		auto timer = std::make_shared<t_timer>(this, std::move(a_function), a_interval, a_single);
@@ -91,10 +105,10 @@ public:
 	}
 };
 
-inline t_loop* f_loop()
+inline t_loop& f_loop()
 {
 	if (!t_loop::v_instance) throw std::runtime_error("no loop.");
-	return t_loop::v_instance;
+	return *t_loop::v_instance;
 }
 
 }

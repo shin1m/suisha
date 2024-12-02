@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 			loop.f_timer([value]
 			{
 				std::cout << "single: "sv << value << std::endl;
-			}, interval, true);
+			}, std::chrono::milliseconds(interval), true);
 		}},
 		{"every"s, [&]
 		{
@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
 			timers.push_back(loop.f_timer([value]
 			{
 				std::cout << "repeat: "sv << value << std::endl;
-			}, interval));
+			}, std::chrono::milliseconds(interval)));
 		}},
 		{"stop"s, [&]
 		{

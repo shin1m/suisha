@@ -135,7 +135,7 @@ poll
 		{
 			log.emplace_back("timer"sv);
 			loop.f_exit();
-		}, 100, true);
+		}, 100ms, true);
 		loop.f_run();
 		assert(f_join(log) == R"(
 wait
@@ -150,7 +150,7 @@ timer
 		{
 			log.emplace_back("timer"sv);
 			if (++n >= 3) loop.f_exit();
-		}, 100);
+		}, 100ms);
 		loop.f_run();
 		assert(f_join(log) == R"(
 wait

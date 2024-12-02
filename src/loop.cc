@@ -28,10 +28,10 @@ std::function<void()> t_loop::f_unpost()
 
 void t_loop::f_queue(const std::shared_ptr<t_timer>& a_timer)
 {
-	auto time = &a_timer->v_time;
-	*time = std::chrono::steady_clock::now() + std::chrono::milliseconds(a_timer->v_interval);
+	auto& time = a_timer->v_time;
+	time = std::chrono::steady_clock::now() + a_timer->v_interval;
 	auto p = &v_timer;
-	while (*p && (*p)->v_time <= *time) p = &(*p)->v_next;
+	while (*p && (*p)->v_time <= time) p = &(*p)->v_next;
 	a_timer->v_next = std::move(*p);
 	*p = a_timer;
 }
@@ -85,34 +85,28 @@ void t_loop::f_run()
 	while (true) {
 		v_wait();
 		if (v_loop < current) return;
-		while (true) {
-			if (v_pollfds[0].revents == POLLIN) {
-				f_unpost()();
-				if (v_loop < current) return;
-				v_more = true;
-			}
-			while (v_notifier < v_listeners.size()) {
-				short revents = v_pollfds[v_notifier + 1].revents;
-				v_listeners[v_notifier]((revents & POLLIN) != 0, (revents & POLLOUT) != 0);
-				if (v_loop < current) break;
-				++v_notifier;
-			}
-			v_notifier = 0;
+		if (v_pollfds[0].revents == POLLIN) {
+			f_unpost()();
 			if (v_loop < current) return;
-			while (v_timer) {
-				if (v_timer->v_time > std::chrono::steady_clock::now()) break;
-				auto p = std::move(v_timer);
-				v_timer = std::move(p->v_next);
-				if (p->v_single)
-					p->v_loop = nullptr;
-				else
-					f_queue(p);
-				p->v_function();
-				if (v_loop < current) return;
-			}
-			if (!v_more) break;
-			v_more = false;
-			while (poll(v_pollfds.data(), v_pollfds.size(), 0) < 0) if (errno != EAGAIN && errno != EINTR) throw std::system_error(errno, std::generic_category());
+			v_more = true;
+		}
+		while (v_notifier < v_listeners.size()) {
+			short revents = v_pollfds[v_notifier + 1].revents;
+			v_listeners[v_notifier](revents & POLLIN, revents & POLLOUT);
+			if (v_loop < current) break;
+			++v_notifier;
+		}
+		v_notifier = 0;
+		if (v_loop < current) return;
+		while (v_timer) {
+			if (v_timer->v_time > std::chrono::steady_clock::now()) break;
+			auto p = std::move(v_timer);
+			v_timer = std::move(p->v_next);
+			if (p->v_single)
+				p->v_loop = nullptr;
+			else
+				f_queue(p);
+			p->v_function();
 			if (v_loop < current) return;
 		}
 	}
@@ -120,9 +114,7 @@ void t_loop::f_run()
 
 void t_loop::f_poll(int a_descriptor, bool a_read, bool a_write, std::function<void(bool, bool)>&& a_listener)
 {
-	f_check();
-	size_t i = 1;
-	while (i < v_pollfds.size() && v_pollfds[i].fd != a_descriptor) ++i;
+	size_t i = f_find(a_descriptor);
 	if (i < v_pollfds.size()) {
 		v_listeners[i - 1] = std::move(a_listener);
 	} else {
@@ -131,16 +123,18 @@ void t_loop::f_poll(int a_descriptor, bool a_read, bool a_write, std::function<v
 		v_pollfds.push_back(fd);
 		v_listeners.emplace_back(std::move(a_listener));
 	}
-	v_pollfds[i].events = v_pollfds[i].revents = 0;
-	if (a_read) v_pollfds[i].events |= POLLIN;
-	if (a_write) v_pollfds[i].events |= POLLOUT;
+	f_poll(i, a_read, a_write);
+}
+
+void t_loop::f_poll(int a_descriptor, bool a_read, bool a_write)
+{
+	size_t i = f_find(a_descriptor);
+	if (i < v_pollfds.size()) f_poll(i, a_read, a_write);
 }
 
 void t_loop::f_unpoll(int a_descriptor)
 {
-	f_check();
-	size_t i = 1;
-	while (i < v_pollfds.size() && v_pollfds[i].fd != a_descriptor) ++i;
+	size_t i = f_find(a_descriptor);
 	if (i >= v_pollfds.size()) return;
 	v_pollfds.erase(v_pollfds.begin() + i);
 	--i;

@@ -1,8 +1,3 @@
 add_executable(loop loop.cc)
 target_link_libraries(loop PRIVATE suisha pthread)
 add_test(NAME loop COMMAND loop)
-function(do_test name)
-	add_test(NAME ${name} COMMAND xemmai --verbose "${CMAKE_CURRENT_SOURCE_DIR}/${name}.xm")
-	set_property(TEST ${name} PROPERTY ENVIRONMENT "XEMMAI_MODULE_PATH=${PROJECT_BINARY_DIR}/xemmai")
-endfunction()
-do_test(xemmai-loop)
