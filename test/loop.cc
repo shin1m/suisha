@@ -82,9 +82,9 @@ post
 		int fds[2];
 		pipe(fds);
 		char buffer[1024];
-		loop.f_poll(fds[0], true, false, [&](bool a_readable, bool a_writable)
+		loop.f_poll(fds[0], POLLIN, [&](auto a_events)
 		{
-			if (!a_readable) return;
+			if (!(a_events & POLLIN)) return;
 			ssize_t n = read(fds[0], buffer, sizeof(buffer));
 			log.emplace_back(buffer);
 			close(fds[0]);
@@ -108,9 +108,9 @@ poll
 		int fds[2];
 		pipe(fds);
 		char buffer[1024];
-		loop.f_poll(fds[1], false, true, [&](bool a_readable, bool a_writable)
+		loop.f_poll(fds[1], POLLOUT, [&](auto a_events)
 		{
-			if (!a_writable) return;
+			if (!(a_events & POLLOUT)) return;
 			write(fds[1], "poll", 5);
 			close(fds[1]);
 			loop.f_exit();

@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <vector>
 #include <unistd.h>
-#include <sys/poll.h>
+#include <poll.h>
 
 namespace suisha
 {
@@ -43,7 +43,7 @@ class t_loop
 	bool v_more = false;
 	std::vector<struct pollfd> v_pollfds{1};
 	int v_post;
-	std::vector<std::function<void(bool, bool)>> v_listeners;
+	std::vector<std::function<void(short)>> v_listeners;
 	size_t v_notifier = 0;
 	std::shared_ptr<t_timer> v_timer;
 
@@ -58,12 +58,6 @@ class t_loop
 		size_t i = 1;
 		while (i < v_pollfds.size() && v_pollfds[i].fd != a_descriptor) ++i;
 		return i;
-	}
-	void f_poll(size_t a_i, bool a_read, bool a_write)
-	{
-		v_pollfds[a_i].events = 0;
-		if (a_read) v_pollfds[a_i].events |= POLLIN;
-		if (a_write) v_pollfds[a_i].events |= POLLOUT;
 	}
 	void f_queue(const std::shared_ptr<t_timer>& a_timer);
 
@@ -93,8 +87,8 @@ public:
 		auto p = new std::function<void()>(std::move(a_function));
 		write(v_post, &p, sizeof(p));
 	}
-	void f_poll(int a_descriptor, bool a_read, bool a_write, std::function<void(bool, bool)>&& a_listener);
-	void f_poll(int a_descriptor, bool a_read, bool a_write);
+	void f_poll(int a_descriptor, short a_events, std::function<void(short)>&& a_listener);
+	void f_poll(int a_descriptor, short a_events);
 	void f_unpoll(int a_descriptor);
 	std::shared_ptr<t_timer> f_timer(std::function<void()>&& a_function, const std::chrono::milliseconds& a_interval, bool a_single = false)
 	{

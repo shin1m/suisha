@@ -63,9 +63,9 @@ int main(int argc, char* argv[])
 		}}
 	};
 	try {
-		loop.f_poll(0, true, false, [&](bool a_readable, bool a_writable)
+		loop.f_poll(0, POLLIN, [&](auto a_events)
 		{
-			if (!a_readable) return;
+			if (!(a_events & POLLIN)) return;
 			std::string command;
 			std::cin >> command;
 			auto i = commands.find(command);

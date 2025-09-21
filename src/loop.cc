@@ -91,8 +91,7 @@ void t_loop::f_run()
 			v_more = true;
 		}
 		while (v_notifier < v_listeners.size()) {
-			short revents = v_pollfds[v_notifier + 1].revents;
-			v_listeners[v_notifier](revents & POLLIN, revents & POLLOUT);
+			v_listeners[v_notifier](v_pollfds[v_notifier + 1].revents);
 			if (v_loop < current) break;
 			++v_notifier;
 		}
@@ -112,7 +111,7 @@ void t_loop::f_run()
 	}
 }
 
-void t_loop::f_poll(int a_descriptor, bool a_read, bool a_write, std::function<void(bool, bool)>&& a_listener)
+void t_loop::f_poll(int a_descriptor, short a_events, std::function<void(short)>&& a_listener)
 {
 	size_t i = f_find(a_descriptor);
 	if (i < v_pollfds.size()) {
@@ -123,13 +122,13 @@ void t_loop::f_poll(int a_descriptor, bool a_read, bool a_write, std::function<v
 		v_pollfds.push_back(fd);
 		v_listeners.emplace_back(std::move(a_listener));
 	}
-	f_poll(i, a_read, a_write);
+	v_pollfds[i].events = a_events;
 }
 
-void t_loop::f_poll(int a_descriptor, bool a_read, bool a_write)
+void t_loop::f_poll(int a_descriptor, short a_events)
 {
 	size_t i = f_find(a_descriptor);
-	if (i < v_pollfds.size()) f_poll(i, a_read, a_write);
+	if (i < v_pollfds.size()) v_pollfds[i].events = a_events;
 }
 
 void t_loop::f_unpoll(int a_descriptor)
